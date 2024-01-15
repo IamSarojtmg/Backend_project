@@ -4,6 +4,48 @@ const {
   formatComments,
 } = require("../db/seeds/utils");
 
+const request = require("supertest");
+const app = require("../app");
+const db = require("../db/connection.js");
+const seed = require("../db/seeds/seed.js");
+const data = require("../db/data/test-data/index.js");
+const { forEach } = require("../db/data/test-data/articles.js");
+
+afterAll(() => {
+  return db.end();
+});
+
+beforeEach(() => {
+  return seed(data);
+});
+
+describe("Northcoders News API", () => {
+  describe("api/", () => {
+    describe("Status health check", () => {
+      test("200 - respond with the 200 status code", () => {
+        return request(app).get("/api/healthcheck").expect(200);
+      });
+    });
+
+    describe("/api/topics/", () => {
+      test("responds with an array of topic objects", () => {
+        return request(app)
+          .get("/api/topics")
+          .expect(200)
+          .then((response) => {
+            return response.body;
+          })
+          .then((data) => {
+            const expectedOutput = data.map((elem) => {
+              expect(elem.hasOwnProperty("slug")).toBe(true);
+              expect(elem.hasOwnProperty("description")).toBe(true);
+            });
+          });
+      });
+    });
+  });
+});
+
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
     const timestamp = 1557572706232;
