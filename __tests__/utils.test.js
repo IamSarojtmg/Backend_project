@@ -51,7 +51,47 @@ describe("Northcoders News API", () => {
       });
     });
   });
+
+
+  describe('GET /api/articles/:article_id', () => {
+    it('200 - respond with the correct article ID depening in it ID', () => {
+      return request(app).get('/api/articles/3').expect(200).then((response) => {
+        expect(response.body).toMatchObject({
+          author: 'icellusedkars',
+          title: 'Eight pug gifs that remind me of mitch',
+          article_id: 3,
+          body: 'some gifs',
+          topic: 'mitch',
+          created_at: '2020-11-03T09:12:00.000Z',
+          votes: 0,
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+        })
+      })
+    })
+
+    it('404 - return appopriate error if the user enters an ID that is not in the database', () => {
+      return request(app).get('/api/articles/999').expect(404).then((response) => {
+        expect(response.body.msg).toBe('Article does not exist')
+      })
+    })
+  })
+
+
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
