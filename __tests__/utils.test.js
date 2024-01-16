@@ -9,7 +9,6 @@ const app = require("../app");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data/index.js");
-const { forEach } = require("../db/data/test-data/articles.js");
 
 afterAll(() => {
   return db.end();
@@ -28,18 +27,26 @@ describe("Northcoders News API", () => {
     });
 
     describe("/api/topics/", () => {
-      test("responds with an array of topic objects", () => {
+      test("200 - responds with an array of topic objects", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
           .then((response) => {
-            return response.body;
-          })
-          .then((data) => {
-            const expectedOutput = data.map((elem) => {
+            const expectedOutput = response.body.map((elem) => {
               expect(elem.hasOwnProperty("slug")).toBe(true);
               expect(elem.hasOwnProperty("description")).toBe(true);
             });
+          });
+      });
+    });
+
+    describe("/api", () => {
+      test("200- respond with an object describing the available endpoints", () => {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then((response) => {
+            expect(typeof response.body).toBe("object");
           });
       });
     });
