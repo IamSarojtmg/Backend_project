@@ -9,5 +9,16 @@ const fetchArticleData = (id) => {
     })
 }
 
+const fetchArticle = () => {
+   
+    return db.query(`SELECT articles.article_img_url, articles.votes,articles.created_at, articles.topic, articles.title, articles.author, comments.article_id, COUNT(comments.article_id) AS comment_count FROM articles 
+    JOIN comments ON articles.article_id = comments.article_id
+    GROUP BY comments.article_id, articles.author, articles.title,articles.topic,articles.created_at, articles.votes, articles.article_img_url
+    ORDER BY created_at DESC;`).then(({ rows }) => {
+        return rows
 
-module.exports = fetchArticleData
+    })
+}
+
+module.exports = { fetchArticleData, fetchArticle }
+
