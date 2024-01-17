@@ -55,8 +55,8 @@ describe("Northcoders News API", () => {
 
   describe('GET /api/articles/:article_id', () => {
     it('200 - respond with the correct article ID depening in it ID', () => {
-      return request(app).get('/api/articles/3').expect(200).then((response) => {
-        expect(response.body).toMatchObject({
+      return request(app).get('/api/articles/3').expect(200).then(({body}) => {
+        expect(body.article).toMatchObject({
           author: 'icellusedkars',
           title: 'Eight pug gifs that remind me of mitch',
           article_id: 3,
@@ -70,8 +70,29 @@ describe("Northcoders News API", () => {
     })
 
     it('404 - return appopriate error if the user enters an ID that is not in the database', () => {
-      return request(app).get('/api/articles/999').expect(404).then((response) => {
-        expect(response.body.msg).toBe('Article does not exist')
+      return request(app).get('/api/articles/999').expect(404).then(({body}) => {
+        expect(body.msg).toBe('Article does not exist')
+      })
+    })
+
+    it('400- responds with an error message when entered invalid input', () => {
+      return request(app).get('/api/articles/katherine').expect(400).then(({body}) => {
+        expect(body.msg).toBe('Bad request')
+      })
+    })
+  })
+
+
+  describe('GET /api/articles', () => {
+    it('200 - responds with an articles array of articles objects with no body and in decending order', () => {
+      return request(app).get('/api/articles').expect(200).then(({ body }) => {
+        // console.log(Object.keys(body.article[0]));
+        body.article.map((key) => {
+          expect(key.hasOwnProperty('body')).toBe(false)
+        })
+        expect(body.article.length).toBe(5)
+        expect(body.article).toBeSortedBy('created_at', { descending: true })
+        
       })
     })
   })
