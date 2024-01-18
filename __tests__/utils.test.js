@@ -10,8 +10,6 @@ const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data/index.js");
 
-
-
 afterAll(() => {
   return db.end();
 });
@@ -54,103 +52,199 @@ describe("Northcoders News API", () => {
     });
   });
 
+  describe("GET /api/articles/:article_id", () => {
+    it("200 - respond with the correct article ID depening in it ID", () => {
+      return request(app)
+        .get("/api/articles/3")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            author: "icellusedkars",
+            title: "Eight pug gifs that remind me of mitch",
+            article_id: 3,
+            body: "some gifs",
+            topic: "mitch",
+            created_at: "2020-11-03T09:12:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
 
-  describe('GET /api/articles/:article_id', () => {
-    it('200 - respond with the correct article ID depening in it ID', () => {
-      return request(app).get('/api/articles/3').expect(200).then(({body}) => {
-        expect(body.article).toMatchObject({
-          author: 'icellusedkars',
-          title: 'Eight pug gifs that remind me of mitch',
-          article_id: 3,
-          body: 'some gifs',
-          topic: 'mitch',
-          created_at: '2020-11-03T09:12:00.000Z',
-          votes: 0,
-          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
-        })
-      })
-    })
+    it("404 - return appropriate error if the user enters an ID that is not in the database", () => {
+      return request(app)
+        .get("/api/articles/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Article does not exist");
+        });
+    });
 
-    it('404 - return appopriate error if the user enters an ID that is not in the database', () => {
-      return request(app).get('/api/articles/999').expect(404).then(({body}) => {
-        expect(body.msg).toBe('Article does not exist')
-      })
-    })
+    it("400- responds with an error message when entered invalid input", () => {
+      return request(app)
+        .get("/api/articles/katherine")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+  });
 
-    it('400- responds with an error message when entered invalid input', () => {
-      return request(app).get('/api/articles/katherine').expect(400).then(({body}) => {
-        expect(body.msg).toBe('Bad request')
-      })
-    })
-  })
+  describe("GET /api/articles", () => {
+    it("200 - responds with an articles array of articles objects with no body and in decending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          body.article.map((key) => {
+            expect(key.hasOwnProperty("body")).toBe(false);
+            expect(key.hasOwnProperty("comment_count")).toBe(true);
+          });
+          expect(body.article.length).toBe(5);
+          expect(body.article).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+  });
 
+  describe("GET /api/articles/:article_id/comments", () => {
+    it("200 - respond with an array of properties for the given ID", () => {
+      return request(app)
+        .get("/api/articles/9/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.length).toBe(2);
+          expect(body.article).toBeSortedBy("created_at");
+          body.article.map((keys) => {
+            expect(keys.hasOwnProperty("randomKey")).toBe(false);
+            expect(keys.hasOwnProperty("comment_id")).toBe(true);
+            expect(keys.hasOwnProperty("votes")).toBe(true);
+            expect(keys.hasOwnProperty("created_at")).toBe(true);
+            expect(keys.hasOwnProperty("author")).toBe(true);
+            expect(keys.hasOwnProperty("body")).toBe(true);
+            expect(keys.hasOwnProperty("article_id")).toBe(true);
+          });
+        });
+    });
 
-  describe('GET /api/articles', () => {
-    it('200 - responds with an articles array of articles objects with no body and in decending order', () => {
-      return request(app).get('/api/articles').expect(200).then(({ body }) => {
-        // console.log(Object.keys(body.article[0]));
-        body.article.map((key) => {
-          expect(key.hasOwnProperty('body')).toBe(false)
-          expect(key.hasOwnProperty('comment_count')).toBe(true)
-          
-        })
-        expect(body.article.length).toBe(5)
-        expect(body.article).toBeSortedBy('created_at', { descending: true })
-        
-      })
-    })
-  })
+    it("404 - respond stating that the id does not exists", () => {
+      return request(app)
+        .get("/api/articles/1000/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
 
+    it("400 - respond with a bad request message", () => {
+      return request(app)
+        .get("/api/articles/one/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+  });
 
-  describe('GET /api/articles/:article_id/comments', () => {
-    it('200 - respond with an array of properties for the given ID', () => {
-      return request(app).get('/api/articles/9/comments').expect(200).then(({ body }) => {
-        console.log(body.article.length, '------------------body in test');
-        expect(body.article.length).toBe(2)
-        expect(body.article).toBeSortedBy('created_at')
-        body.article.map(keys => {
-          expect(keys.hasOwnProperty('randomKey')).toBe(false)
-          expect(keys.hasOwnProperty('comment_id')).toBe(true)
-          expect(keys.hasOwnProperty('votes')).toBe(true)
-          expect(keys.hasOwnProperty('created_at')).toBe(true)
-          expect(keys.hasOwnProperty('author')).toBe(true)
-          expect(keys.hasOwnProperty('body')).toBe(true)
-          expect(keys.hasOwnProperty('article_id')).toBe(true)
-        })
-      
-    })
-    })
-    
-    it('404 - respond stating that the id does not exists', () => {
-      return request(app).get('/api/articles/1000/comments').expect(404).then(({ body }) => {
-        console.log(body.msg);
-        expect(body.msg).toBe('No article found')
-      })
-    })
+  describe("CORE: POST /api/articles/:article_id/comments", () => {
+    it("201 - respond with the new comment that is posted and the ID matches as well", () => {
+      const newComt = {
+        username: "icellusedkars",
+        body: "No comment...",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComt)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment.body).toBe(newComt.body);
+          expect(body.comment.article_id).toBe(1);
+        });
+    });
 
-    it('400 - respond with a bad request message', () => {
-      return request(app).get('/api/articles/one/comments').expect(400).then(({ body }) => {
+    it("201 - check if the username and body exists or not", () => {
+      const newComt = {
+        username: "icellusedkars",
+        body: "No comment...",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComt)
+        .expect(201)
+        .then(({ body }) => {
+          expect("author" in body.comment).toBe(true);
+          expect("body" in body.comment).toBe(true);
+        });
+    });
 
-        expect(body.msg).toBe('Bad request')
-      })
-    })
-})
+    it("201 - Return a 201 status if an extra key is added in the newComt Object", () => {
+      const newComt = {
+        username: "icellusedkars",
+        body: "No comment...",
+        thisIsANewKey: "A new extra value added just for testing",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComt)
+        .expect(201);
+    });
 
+    it("404 - respond with an appropriate error message when entered an username that does not exists", () => {
+      const newComt = {
+        username: "petsarebest",
+        body: "No comment...",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComt)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not found");
+        });
+    });
+
+    it("404 - respond with an appropriate error message when entered an non existent article_id", () => {
+      const newComt = {
+        username: "petsarebest",
+        body: "No comment...",
+      };
+      return request(app)
+        .post("/api/articles/1000/comments")
+        .send(newComt)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not found");
+        });
+    });
+
+    it("400 - respond with an appropriate error message if the user does not post a body key ", () => {
+      const newComt = {
+        username: "petsarebest",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComt)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+
+    it("400 - respond with an appropriate error message if the user enters a invalid article_id ", () => {
+      const newComt = {
+        username: "petsarebest",
+        body: "No comment...",
+      };
+      return request(app)
+        .post("/api/articles/nonsense/comments")
+        .send(newComt)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+  });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
