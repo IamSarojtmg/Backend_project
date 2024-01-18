@@ -10,6 +10,8 @@ const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data/index.js");
 
+
+
 afterAll(() => {
   return db.end();
 });
@@ -89,6 +91,8 @@ describe("Northcoders News API", () => {
         // console.log(Object.keys(body.article[0]));
         body.article.map((key) => {
           expect(key.hasOwnProperty('body')).toBe(false)
+          expect(key.hasOwnProperty('comment_count')).toBe(true)
+          
         })
         expect(body.article.length).toBe(5)
         expect(body.article).toBeSortedBy('created_at', { descending: true })
@@ -97,6 +101,40 @@ describe("Northcoders News API", () => {
     })
   })
 
+
+  describe('GET /api/articles/:article_id/comments', () => {
+    it('200 - respond with an array of properties for the given ID', () => {
+      return request(app).get('/api/articles/9/comments').expect(200).then(({ body }) => {
+        console.log(body.article.length, '------------------body in test');
+        expect(body.article.length).toBe(2)
+        expect(body.article).toBeSortedBy('created_at')
+        body.article.map(keys => {
+          expect(keys.hasOwnProperty('randomKey')).toBe(false)
+          expect(keys.hasOwnProperty('comment_id')).toBe(true)
+          expect(keys.hasOwnProperty('votes')).toBe(true)
+          expect(keys.hasOwnProperty('created_at')).toBe(true)
+          expect(keys.hasOwnProperty('author')).toBe(true)
+          expect(keys.hasOwnProperty('body')).toBe(true)
+          expect(keys.hasOwnProperty('article_id')).toBe(true)
+        })
+      
+    })
+    })
+    
+    it('404 - respond stating that the id does not exists', () => {
+      return request(app).get('/api/articles/1000/comments').expect(404).then(({ body }) => {
+        console.log(body.msg);
+        expect(body.msg).toBe('No article found')
+      })
+    })
+
+    it('400 - respond with a bad request message', () => {
+      return request(app).get('/api/articles/one/comments').expect(400).then(({ body }) => {
+
+        expect(body.msg).toBe('Bad request')
+      })
+    })
+})
 
 });
 
