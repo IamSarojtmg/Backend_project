@@ -10,7 +10,7 @@ const {
   postComment,
   updateArticle,
 } = require("./controller/getArticleId.controller");
-const getCommentId = require("./controller/comment.controller");
+const {getCommentId} = require("./controller/comment.controller");
 
 
 app.use(express.json());

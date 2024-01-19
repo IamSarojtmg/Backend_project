@@ -245,79 +245,95 @@ describe("Northcoders News API", () => {
     });
   });
 
-
-
-
-
-
-  describe('CORE: PATCH /api/articles/:article_id', () => {
-    it('200 - Respond with the votes column being added with article_id 1', () => {
+  describe("CORE: PATCH /api/articles/:article_id", () => {
+    it("200 - Respond with the votes column being added with article_id 1", () => {
       const voteObj = {
-        inc_votes : 10
-      }
-      return request(app).patch('/api/articles/1').send(voteObj).expect(200).then(({ body }) => {
-        expect(body.article.votes).toBe(110)
-        expect(body.article.article_id).toBe(1)
-        expect(body.article.title).toBe('Living in the shadow of a great man')
-        expect(body.article.author).toBe('butter_bridge')
-        expect(body.article.body).toBe('I find this existence challenging')
-        expect(body.article.created_at).toBe('2020-07-09T20:11:00.000Z')
-      })
-    })
+        inc_votes: 10,
+      };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(voteObj)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.votes).toBe(110);
+          expect(body.article.article_id).toBe(1);
+          expect(body.article.title).toBe(
+            "Living in the shadow of a great man"
+          );
+          expect(body.article.author).toBe("butter_bridge");
+          expect(body.article.body).toBe("I find this existence challenging");
+          expect(body.article.created_at).toBe("2020-07-09T20:11:00.000Z");
+        });
+    });
 
-    it('200 - Respond with the votes column being subtracted with article_id 2', () => {
+    it("200 - Respond with the votes column being subtracted with article_id 2", () => {
       const voteObj = {
-        inc_votes : -10
-      }
-      return request(app).patch('/api/articles/2').send(voteObj).expect(200).then(({ body }) => {
-        expect(body.article.votes).toBe(voteObj.inc_votes)
-      })
-    })
+        inc_votes: -10,
+      };
+      return request(app)
+        .patch("/api/articles/2")
+        .send(voteObj)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.votes).toBe(voteObj.inc_votes);
+        });
+    });
 
-    it('400 - respond with a bad request if the user forgets to enter a vote count', () => {
+    it("400 - respond with a bad request if the user forgets to enter a vote count", () => {
       const voteObj = {
-        inc_votes : ''
-      }
-      return request(app).patch('/api/articles/1').send(voteObj).expect(400).then(( response ) => {
-        expect(response.body.msg).toBe('Bad request')
-        expect(response.badRequest).toBe(true)
-        expect(response.statusCode).toBe(400)
-      })
+        inc_votes: "",
+      };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(voteObj)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+          expect(response.badRequest).toBe(true);
+          expect(response.statusCode).toBe(400);
+        });
+    });
 
-    })
-
-    it('400 - respond and inform that an invalid article has been entered', () => {
+    it("400 - respond and inform that an invalid article has been entered", () => {
       const voteObj = {
-        inc_votes : -10
-      }
+        inc_votes: -10,
+      };
 
-      return request(app).patch('/api/articles/mountain').send(voteObj).expect(400).then(({ body }) => {
-        expect(body.msg).toBe('Bad request')
-      })
-    })
+      return request(app)
+        .patch("/api/articles/mountain")
+        .send(voteObj)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
 
-
-    it('404 - respond with the appopriate message letting the user know that the article is not found if entered an article_id that is not there', () => {
+    it("404 - respond with the appopriate message letting the user know that the article is not found if entered an article_id that is not there", () => {
       const voteObj = {
-        inc_votes : 10
-      }
+        inc_votes: 10,
+      };
 
-      return request(app).patch('/api/articles/99').send(voteObj).expect(404).then(({ body }) => {
-        expect(body.msg).toBe('No article found')
-      })
-    })
+      return request(app)
+        .patch("/api/articles/99")
+        .send(voteObj)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
+  });
 
+  describe("CORE: DELETE /api/comments/:comment_id", () => {
+    it("204 - deletes the specified comment by given ID and returns no body back", () => {
+      return request(app)
+        .delete("/api/comments/3")
+        .expect(204)
+    });
+  });
 
-
-  })
-
-
-
-  describe('CORE: DELETE /api/comments/:comment_id', () => {
-    it.only('204 - deletes the specified comment by given ID and returns no body back', () => {
-      return request(app).delete('/api/comments/1').expect(204).then(({ body }) => {
-        console.log(body, 'in test file');
-      })
+  it('404 - responds with appopriate error when passed with a id that does not exists', () => {
+    return request(app).delete('/api/comments/999').expect(404).then(({ body }) => {
+      expect(body.msg).toBe('Comment does not exist')
     })
   })
 });
