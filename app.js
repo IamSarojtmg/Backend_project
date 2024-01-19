@@ -10,6 +10,8 @@ const {
   postComment,
   updateArticle,
 } = require("./controller/getArticleId.controller");
+const getCommentId = require("./controller/comment.controller");
+
 
 app.use(express.json());
 
@@ -23,6 +25,8 @@ app.get("/api/articles/:articles_id/comments", getCommentByArtcId);
 app.post("/api/articles/:articles_id/comments", postComment);
 
 app.patch("/api/articles/:article_id", updateArticle);
+
+app.delete('/api/comments/:comment_id', getCommentId)
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02" || err.code === "23502") {
