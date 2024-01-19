@@ -310,6 +310,16 @@ describe("Northcoders News API", () => {
 
 
   })
+
+
+
+  describe('CORE: DELETE /api/comments/:comment_id', () => {
+    it.only('204 - deletes the specified comment by given ID and returns no body back', () => {
+      return request(app).delete('/api/comments/1').expect(204).then(({ body }) => {
+        console.log(body, 'in test file');
+      })
+    })
+  })
 });
 
 describe("convertTimestampToDate", () => {
