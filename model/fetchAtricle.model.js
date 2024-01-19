@@ -28,22 +28,54 @@ const fetchArticle = () => {
 };
 
 const fetchComment = (id) => {
-  return db.query(`SELECT comment_id, votes, created_at, author, body, article_id 
+  return db
+    .query(
+      `SELECT comment_id, votes, created_at, author, body, article_id 
   FROM comments
   WHERE article_id = $1
-  ORDER BY created_at`, [id]).then(({ rows }) => {
+  ORDER BY created_at`,
+      [id]
+    )
+    .then(({ rows }) => {
       if (rows.length === 0) {
-          return Promise.reject({passThisMsg: 'No article found'})
+        return Promise.reject({ passThisMsg: "No article found" });
       }
-      return rows
-  })
-}
+      return rows;
+    });
+};
 
 const insertComment = ({ username, body }, article_id) => {
- 
-  return db.query(`INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *`, [username, body, article_id]).then(({ rows }) => {
-    return rows[0]
-  })
-}
+  return db
+    .query(
+      `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *`,
+      [username, body, article_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
 
-module.exports = { fetchArticleData, fetchArticle,fetchComment,insertComment };
+const changeArticleVotes = (id, { inc_votes }) => {
+  return db
+    .query(
+      `UPDATE articles 
+  SET votes = votes + $2
+  WHERE article_id = $1
+  RETURNING *`,
+      [id, inc_votes]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ passThisMsg: "No article found" });
+      }
+      return rows[0];
+    });
+};
+
+module.exports = {
+  fetchArticleData,
+  fetchArticle,
+  fetchComment,
+  insertComment,
+  changeArticleVotes,
+};
