@@ -4,6 +4,7 @@ const getHealthCheck = require("./controller/healthCheck.controller");
 const getTopicsData = require("./controller/getTopics.controller");
 const getApi = require("./controller/getapi.controller");
 const {
+  getArticleByTopic,
   getArticleByID,
   getArticle,
   getCommentByArtcId,
@@ -23,6 +24,9 @@ app.get("/api/articles/:article_id", getArticleByID);
 app.get("/api/articles", getArticle);
 app.get("/api/articles/:articles_id/comments", getCommentByArtcId);
 app.get('/api/users', getUsers)
+
+
+
 
 app.post("/api/articles/:articles_id/comments", postComment);
 
