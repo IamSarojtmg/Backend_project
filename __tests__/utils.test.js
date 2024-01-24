@@ -82,12 +82,12 @@ describe("Northcoders News API", () => {
         });
     });
 
-    it("400- responds with an error message when entered invalid input", () => {
+    it("404- responds with an error message when entered invalid input", () => {
       return request(app)
         .get("/api/articles/katherine")
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("Bad request");
+          expect(body.msg).toBe("Not found");
         });
     });
   });
@@ -104,6 +104,31 @@ describe("Northcoders News API", () => {
           });
           expect(body.article.length).toBe(5);
           expect(body.article).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+  });
+
+  describe("CORE: GET /api/articles (topic query)", () => {
+    it("200 - respond with the database of the desired articles", () => {
+      return request(app)
+        .get("/api/articles/cats")
+        .expect(200)
+        .then(({ body }) => {
+          body.article.forEach((elems) => {
+            expect(elems.topic).toBe("cats");
+            expect(elems.hasOwnProperty("author")).toBe(true);
+            expect(elems.hasOwnProperty("dontHaveThisProperty")).toBe(false);
+          });
+        });
+    });
+
+    it("404- responds with an error message when entered invalid input", () => {
+      return request(app)
+        .get("/api/articles/notatopic")
+        .expect(404)
+        .then(({ body }) => {
+          console.log(body);
+          expect(body.msg).toBe("Not found");
         });
     });
   });
@@ -365,12 +390,9 @@ describe("Northcoders News API", () => {
     });
 
     it("404 - respond with a bad request if the ented invalid endpoint", () => {
-      return request(app).get("/api/non-existent-user").expect(404)
+      return request(app).get("/api/non-existent-user").expect(404);
     });
   });
-
-
-
 });
 
 describe("convertTimestampToDate", () => {

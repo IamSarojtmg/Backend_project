@@ -1,6 +1,8 @@
 const db = require("../db/connection");
 
 const fetchArticleData = (id) => {
+
+  console.log('fetchByData');
   return db
     .query(
       `SELECT author,title,article_id,body,topic,created_at,votes,article_img_url FROM articles WHERE article_id = $1`,
@@ -15,6 +17,7 @@ const fetchArticleData = (id) => {
 };
 
 const fetchArticle = () => {
+  console.log('in model');
   return db
     .query(
       `SELECT articles.article_img_url, articles.votes,articles.created_at, articles.topic, articles.title, articles.author, comments.article_id, COUNT(comments.article_id) AS comment_count FROM articles 
@@ -23,6 +26,8 @@ const fetchArticle = () => {
     ORDER BY created_at DESC;`
     )
     .then(({ rows }) => {
+      rows.forEach(elems => {
+      })
       return rows;
     });
 };
@@ -72,10 +77,21 @@ const changeArticleVotes = (id, { inc_votes }) => {
     });
 };
 
+const fetchArticlesByTopic = (id) => {
+  console.log('by topic');
+  return db.query(`SELECT * FROM articles WHERE topic = $1`, [id]).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({passThisMsg: 'Not found'})
+    }
+    return rows
+  })
+}
+
 module.exports = {
   fetchArticleData,
   fetchArticle,
   fetchComment,
   insertComment,
   changeArticleVotes,
+  fetchArticlesByTopic
 };
