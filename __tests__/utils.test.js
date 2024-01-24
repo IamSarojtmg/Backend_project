@@ -9,6 +9,7 @@ const app = require("../app");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data/index.js");
+const endpoint = require("../endpoints.json");
 
 afterAll(() => {
   return db.end();
@@ -45,8 +46,8 @@ describe("Northcoders News API", () => {
         return request(app)
           .get("/api")
           .expect(200)
-          .then((response) => {
-            expect(typeof response.body).toBe("object");
+          .then(({ body }) => {
+            expect(body.endpoint).toEqual(endpoint);
           });
       });
     });
@@ -325,17 +326,51 @@ describe("Northcoders News API", () => {
 
   describe("CORE: DELETE /api/comments/:comment_id", () => {
     it("204 - deletes the specified comment by given ID and returns no body back", () => {
+      return request(app).delete("/api/comments/3").expect(204);
+    });
+
+    it("404 - responds with appopriate error when passed with a id that does not exists", () => {
       return request(app)
-        .delete("/api/comments/3")
-        .expect(204)
+        .delete("/api/comments/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Comment does not exist");
+        });
+    });
+
+    /*  test('DELETE:400 responds with an appropriate status and error message when given an invalid id', () => {
+    return request(app)
+      .delete('/api/teams/not-a-team')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('Bad request');
+      });
+  }); */
+  });
+
+  describe("CORE: GET /api/users", () => {
+    it("200 - respond with the data that are inside the users table", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.users.length).toBe(4);
+          const expectedOutput = body.users.forEach((elements) => {
+            expect(elements.hasOwnProperty("username")).toBe(true);
+            expect(elements.hasOwnProperty("name")).toBe(true);
+            expect(elements.hasOwnProperty("avatar_url")).toBe(true);
+            expect(elements.hasOwnProperty("notInsideUsers")).toBe(false);
+          });
+        });
+    });
+
+    it("404 - respond with a bad request if the ented invalid endpoint", () => {
+      return request(app).get("/api/non-existent-user").expect(404)
     });
   });
 
-  it('404 - responds with appopriate error when passed with a id that does not exists', () => {
-    return request(app).delete('/api/comments/999').expect(404).then(({ body }) => {
-      expect(body.msg).toBe('Comment does not exist')
-    })
-  })
+
+
 });
 
 describe("convertTimestampToDate", () => {
