@@ -127,7 +127,6 @@ describe("Northcoders News API", () => {
         .get("/api/articles/notatopic")
         .expect(404)
         .then(({ body }) => {
-          console.log(body);
           expect(body.msg).toBe("Not found");
         });
     });

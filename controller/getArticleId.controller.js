@@ -27,7 +27,7 @@ const getArticleByID = (req, res, next) => {
   const { article_id } = req.params;
 
   if (isNaN(article_id)) {
-    console.log(article_id);
+
     fetchArticlesByTopic(article_id).then((article) => {
       res.status(200).send({article})
     }).catch(next)
@@ -76,7 +76,7 @@ const getArticleByID = (req, res, next) => {
 
 
 const getArticle = (req, res, next) => {
-  console.log('controller');
+
   fetchArticle()
     .then((article) => {
       res.status(200).send({ article });
@@ -115,7 +115,7 @@ const updateArticle = (req, res, next) => {
 
 const getArticleByTopic = (req,res,next) => {
   const topic = req.params.topic
-  console.log(topic);
+
 
 }
 
