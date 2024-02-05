@@ -93,12 +93,13 @@ describe("Northcoders News API", () => {
   });
 
   describe("GET /api/articles", () => {
-    it("200 - responds with an articles array of articles objects with no body and in decending order", () => {
+    it.only("200 - responds with an articles array of articles objects with no body and in decending order", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
         .then(({ body }) => {
           body.article.map((key) => {
+            console.log(key);
             expect(key.hasOwnProperty("body")).toBe(false);
             expect(key.hasOwnProperty("comment_count")).toBe(true);
           });

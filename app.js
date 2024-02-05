@@ -13,8 +13,9 @@ const {
 } = require("./controller/getArticleId.controller");
 const { getCommentId } = require("./controller/comment.controller");
 const {getUsers} = require('./controller/users.controller')
+const cors = require('cors')
 
-
+app.use(cors());
 app.use(express.json());
 
 app.get("/api/healthcheck", getHealthCheck);
