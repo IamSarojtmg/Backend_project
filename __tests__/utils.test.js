@@ -54,11 +54,12 @@ describe("Northcoders News API", () => {
   });
 
   describe("GET /api/articles/:article_id", () => {
-    it("200 - respond with the correct article ID depening in it ID", () => {
+    it.only("200 - respond with the correct article ID depening in it ID", () => {
       return request(app)
         .get("/api/articles/3")
         .expect(200)
         .then(({ body }) => {
+          console.log(body);
           expect(body.article).toMatchObject({
             author: "icellusedkars",
             title: "Eight pug gifs that remind me of mitch",
@@ -189,7 +190,7 @@ describe("Northcoders News API", () => {
 
     it("201 - check if the username and body exists or not", () => {
       const newComt = {
-        username: "icellusedkars",
+        username: "butter_bridge",
         body: "No comment...",
       };
       return request(app)
@@ -197,6 +198,7 @@ describe("Northcoders News API", () => {
         .send(newComt)
         .expect(201)
         .then(({ body }) => {
+          console.log(body.comment,`test`);
           expect("author" in body.comment).toBe(true);
           expect("body" in body.comment).toBe(true);
         });
@@ -242,6 +244,10 @@ describe("Northcoders News API", () => {
         });
     });
 
+
+
+
+
     it("400 - respond with an appropriate error message if the user does not post a body key ", () => {
       const newComt = {
         username: "petsarebest",
@@ -251,9 +257,30 @@ describe("Northcoders News API", () => {
         .send(newComt)
         .expect(400)
         .then(({ body }) => {
+          console.log(body);
           expect(body.msg).toBe("Bad request");
         });
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     it("400 - respond with an appropriate error message if the user enters a invalid article_id ", () => {
       const newComt = {
@@ -378,6 +405,7 @@ describe("Northcoders News API", () => {
         .get("/api/users")
         .expect(200)
         .then(({ body }) => {
+          console.log(body);
           expect(body.users.length).toBe(4);
           const expectedOutput = body.users.forEach((elements) => {
             expect(elements.hasOwnProperty("username")).toBe(true);

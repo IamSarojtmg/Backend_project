@@ -24,32 +24,22 @@ const {
 
 
 const getArticleByID = (req, res, next) => {
+  // this needs to be changed to a query and not starting with /
   const { article_id } = req.params;
 
   if (isNaN(article_id)) {
-
-    fetchArticlesByTopic(article_id).then((article) => {
-      res.status(200).send({article})
-    }).catch(next)
-
+    fetchArticlesByTopic(article_id)
+      .then((article) => {
+        res.status(200).send({ article });
+      })
+      .catch(next);
   } else {
-    
-   
-        fetchArticleData(article_id)
-          .then((article) => {
-            res.status(200).send({ article });
-          })
-          .catch(next);
+    fetchArticleData(article_id)
+      .then((article) => {
+        res.status(200).send({ article });
+      })
+      .catch(next);
   }
-  
-
-
-
-
-    
-  
-
-
 };
 
 
@@ -95,7 +85,9 @@ const getCommentByArtcId = (req, res, next) => {
 
 const postComment = (req, res, next) => {
   const { articles_id } = req.params;
+  console.log(articles_id, `article id`);
   const newComment = req.body;
+  console.log(newComment);
   insertComment(newComment, articles_id)
     .then((comment) => {
       res.status(201).send({ comment });
